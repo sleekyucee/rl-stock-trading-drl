@@ -1,0 +1,37 @@
+#python
+__pycache__/
+*.pyc
+
+#environment
+.env/
+.venv/
+env/
+venv/
+
+#jupyter
+.ipynb_checkpoints/
+
+#data and models
+*.npy
+*.pkl
+*.pt
+*.csv
+*.zip
+
+#results, logs, plots
+*.png
+*.jpg
+*.log
+*.mp4
+*.pdf
+results/
+logs/
+
+#wandB
+wandb/
+.wandb*
+
+#colab/MacOS/Windows garbage
+.DS_Store
+Thumbs.db
+

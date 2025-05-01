@@ -1,0 +1,13 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+tqdm
+wandb
+pyyaml
+
+#for advanced DQN tasks
+torch
+torchvision
+torchaudio
+
