@@ -1,0 +1,22 @@
+data_settings:
+  csv_path: "G:\My Drive\dataset\TSLA_daily_features.csv" #insert path 
+  n_bins: 5
+  window_size: 30
+
+env_settings:
+  initial_cash: 10000
+
+train_settings:
+  alpha: 0.5
+  gamma: 0.9
+  epsilon: 1.0
+  epsilon_min: 0.01
+  epsilon_decay: 0.995
+  n_episodes: 100
+  seed: 42
+
+experiment_settings:
+  experiment_name: "qlearning_config_1"
+  project: "tsla_qlearning"
+  use_wandb: true
+
