@@ -1,0 +1,26 @@
+data_settings:
+  csv_path: "/content/drive/MyDrive/dataset/train.csv"
+  test_csv_path: "/content/drive/MyDrive/dataset/test.csv"
+  n_bins: 5
+  window_size: 30
+
+env_settings:
+  initial_cash: 10000
+
+train_settings:
+  alpha: 0.6
+  gamma: 0.9
+  epsilon: 0.8
+  epsilon_min: 0.01
+  epsilon_decay: 0.98
+  n_episodes: 1000
+  seed: 42
+
+experiment_settings:
+  experiment_name: "qlearning_bltz_6"
+  project: "tsla_qlearning"
+  use_wandb: true
+  policy_type: "boltzmann"
+
+eval_settings:
+  discretizer_path: "/content/drive/MyDrive/rl-stock-trading-drl/ql_baseline/models/discretizer_qlearning_bltz_6.pkl"

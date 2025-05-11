@@ -1,0 +1,10 @@
+#requirements.txt
+
+ray[rllib]
+gymnasium[atari]
+wandb
+matplotlib
+pyyaml
+tqdm
+numpy
+torch

@@ -1,4 +1,4 @@
-#scripts/env.py
+#env
 
 import random
 

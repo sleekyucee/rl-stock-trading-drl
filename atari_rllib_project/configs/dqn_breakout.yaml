@@ -1,0 +1,39 @@
+#dqn_breakout
+
+env_settings:
+  env_name: "ALE/Breakout-v5"
+  seed: 42
+
+train_settings:
+  total_timesteps: 5000000       
+  lr: 0.00025                     
+  gamma: 0.995                    
+  dueling: true
+  double_q: true
+  n_step: 3
+
+  #rollout/batching
+  num_rollout_workers: 4
+  rollout_fragment_length: 200   
+  train_batch_size_per_learner: 32  
+  num_steps_sampled_before_learning_starts: 20000
+  target_network_update_freq: 10000
+
+  #replay buffer
+  prioritized_replay: true
+  prioritized_replay_alpha: 0.6
+  prioritized_replay_beta: 0.4
+  prioritized_replay_eps: 1e-6
+
+  #stability
+  grad_clip: 0.5               
+  num_gpus_per_learner: 1
+  num_cpus_per_learner: 1
+
+  checkpoint_freq: 10
+  max_iters: 1000                 
+
+experiment_settings:
+  experiment_name: "dqn_breakout_optimised"
+  project: "atari_rllib"
+  use_wandb: true

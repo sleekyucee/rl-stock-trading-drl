@@ -14,6 +14,13 @@ def set_seed(seed):
     """Ensure reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
+    try:
+        import torch
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+    except ImportError:
+        pass  #torch may not be installed during static testing
 
 def get_action_mapping():
     """Returns the action ID to label mapping."""
@@ -22,18 +29,3 @@ def get_action_mapping():
         1: 'Sell',
         2: 'Hold'
     }
-
-def epsilon_greedy_action(q_values, epsilon):
-    """
-    Chooses an action using epsilon-greedy strategy.
-    Args:
-        q_values (list): Q-values for available actions.
-        epsilon (float): Probability of random action.
-    Returns:
-        int: selected action index.
-    """
-    if random.random() < epsilon:
-        return random.randint(0, len(q_values) - 1)
-    else:
-        return np.argmax(q_values)
-

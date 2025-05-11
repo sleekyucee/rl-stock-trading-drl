@@ -1,0 +1,26 @@
+data_settings:
+  csv_path: "/content/drive/MyDrive/dataset/train.csv"
+  test_csv_path: "/content/drive/MyDrive/dataset/test.csv"
+  n_bins: 5
+  window_size: 30
+
+env_settings:
+  initial_cash: 10000
+
+train_settings:
+  alpha: 0.4
+  gamma: 0.85
+  epsilon: 1.0
+  epsilon_min: 0.01
+  epsilon_decay: 0.980
+  n_episodes: 1000
+  seed: 42
+
+experiment_settings:
+  experiment_name: "qlearning_eps_2"
+  project: "tsla_qlearning"
+  use_wandb: true
+  policy_type: "epsilon-greedy"
+
+eval_settings:
+  discretizer_path: "/content/drive/MyDrive/rl-stock-trading-drl/ql_baseline/models/discretizer_qlearning_eps_2.pkl"

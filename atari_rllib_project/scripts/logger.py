@@ -4,16 +4,16 @@ import wandb
 import os
 
 class Logger:
-    def __init__(self, experiment_name, project="tsla_qlearning"):
+    def __init__(self, experiment_name, project="atari_rllib"):
         """Initializes WandB for logging metrics."""
         self.logger = wandb.init(project=project, name=experiment_name)
 
     def log(self, metrics):
-        """Logs metrics like reward, epsilon, etc."""
+        """Logs metrics like reward, loss, etc."""
         self.logger.log(metrics)
 
     def save_file(self, file_path):
-        """Logs a file to WandB using only filename (no symlink issues)."""
+        """Logs a file to WandB using only filename"""
         try:
             filename_only = os.path.basename(file_path)
             wandb.save(filename_only)
@@ -24,3 +24,4 @@ class Logger:
     def finish(self):
         """Closes the WandB run."""
         self.logger.finish()
+

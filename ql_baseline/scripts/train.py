@@ -1,47 +1,66 @@
-#scripts/train.py
+#train
 
 import os
-import argparse
+import sys
+import pickle
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+#add project root to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.append(project_root)
+
 from scripts.utils import load_config, set_seed
-from scripts.dataset import load_stock_data, discretize_features
+from scripts.dataset import load_stock_data, fit_discretizer, apply_discretizer
 from scripts.env import reset_environment, step_environment
 from scripts.model import QTableAgent
 from scripts.logger import Logger
 
-def main(config):
-    # Set seed
+def main(config_path):
+    config = load_config(config_path)
+
+    #set seed
     set_seed(config['train_settings']['seed'])
 
-    # Load and preprocess data
+    #load and preprocess data
     df_continuous = load_stock_data(config['data_settings']['csv_path'])
-    df_discrete, _ = discretize_features(df_continuous, n_bins=config['data_settings']['n_bins'])
 
-    # WandB logger
-    logger = None
-    if config['experiment_settings']['use_wandb']:
-        logger = Logger(
-            experiment_name=config['experiment_settings']['experiment_name'],
-            project=config['experiment_settings']['project']
-        )
+    #fit and apply discretizer on training data
+    discretizer = fit_discretizer(df_continuous, n_bins=config['data_settings']['n_bins'])
+    df_discrete = apply_discretizer(df_continuous, discretizer)
 
-    # Agent
+    #save the discretizer
+    discretizer_path = os.path.join("models", f"discretizer_{config['experiment_settings']['experiment_name']}.pkl")
+    os.makedirs(os.path.dirname(discretizer_path), exist_ok=True)
+    with open(discretizer_path, "wb") as f:
+        pickle.dump(discretizer, f)
+
+    #initialize WandB logger
+    logger = Logger(
+        experiment_name=config['experiment_settings']['experiment_name'],
+        project=config['experiment_settings']['project']
+    ) if config['experiment_settings']['use_wandb'] else None
+
+    #determine policy type
+    policy_type = config['experiment_settings'].get("policy_type", "epsilon-greedy")
+
+    #initialize agent
     agent = QTableAgent(
         n_actions=3,
         alpha=config['train_settings']['alpha'],
         gamma=config['train_settings']['gamma'],
         epsilon=config['train_settings']['epsilon'],
         epsilon_min=config['train_settings']['epsilon_min'],
-        epsilon_decay=config['train_settings']['epsilon_decay']
+        epsilon_decay=config['train_settings']['epsilon_decay'],
+        policy_type=policy_type
     )
 
-    # Logs
     rewards_per_episode = []
     final_portfolio_values = []
 
+    #training loop
     for episode in tqdm(range(config['train_settings']['n_episodes']), desc="Training episodes"):
         state_disc, state_cont, idx, portfolio = reset_environment(
             df_discrete, df_continuous,
@@ -50,8 +69,8 @@ def main(config):
         )
 
         state_key = tuple(state_disc.values.flatten())
-        done = False
         total_reward = 0
+        done = False
 
         while not done:
             action = agent.select_action(state_key)
@@ -74,7 +93,6 @@ def main(config):
                 done = True
 
         agent.decay_epsilon()
-
         rewards_per_episode.append(total_reward)
         final_portfolio_values.append(portfolio['total_value'])
 
@@ -85,25 +103,26 @@ def main(config):
                 "epsilon": agent.epsilon
             })
 
-    # Save outputs
-    os.makedirs("qlearning_baseline/models", exist_ok=True)
-    model_path = f"qlearning_baseline/models/q_table_{config['experiment_settings']['experiment_name']}.pkl"
-    agent.save(model_path)
+    #save model and results
+    model_dir = "models"
+    os.makedirs(model_dir, exist_ok=True)
 
-    if logger:
-        logger.save_file(model_path)
-        logger.finish()
+    filename = f"q_table_{config['experiment_settings']['experiment_name']}.pkl"
+    agent.save(os.path.join(model_dir, filename))
 
-    np.save(f"qlearning_baseline/rewards_{config['experiment_settings']['experiment_name']}.npy", rewards_per_episode)
-    np.save(f"qlearning_baseline/portfolio_{config['experiment_settings']['experiment_name']}.npy", final_portfolio_values)
+    np.save(f"rewards_{config['experiment_settings']['experiment_name']}.npy", rewards_per_episode)
+    np.save(f"portfolio_{config['experiment_settings']['experiment_name']}.npy", final_portfolio_values)
 
     print(f"Training complete for {config['experiment_settings']['experiment_name']}")
 
+    if logger:
+        logger.save_file(filename)
+        logger.finish()
+
+#support CLI execution
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, required=True, help="Path to YAML config file")
-    args = parser.parse_args()
+    if len(sys.argv) != 2:
+        print("Usage: python train.py <config_path>")
+        sys.exit(1)
 
-    config = load_config(args.config)
-    main(config)
-
+    main(sys.argv[1])

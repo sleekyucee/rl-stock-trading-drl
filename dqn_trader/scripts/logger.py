@@ -4,7 +4,7 @@ import wandb
 import os
 
 class Logger:
-    def __init__(self, experiment_name, project="tsla_qlearning"):
+    def __init__(self, experiment_name, project="tsla_dqn"):
         """Initializes WandB for logging metrics."""
         self.logger = wandb.init(project=project, name=experiment_name)
 

@@ -1,0 +1,30 @@
+#dqn_double
+
+data_settings:
+  csv_path: "/users/adgs898/sharedscratch/dqn_trader/train.csv"
+  valid_csv_path: "/users/adgs898/sharedscratch/dqn_trader/valid.csv"
+  test_csv_path:  "/content/drive/MyDrive/dataset/test.csv" 
+  window_size: 30
+
+env_settings:
+  initial_cash: 10000
+
+train_settings:
+  gamma: 0.99
+  epsilon_start: 1.0
+  epsilon_min: 0.05
+  epsilon_decay: 0.995
+  learning_rate: 0.0005
+  batch_size: 64
+  buffer_size: 50000
+  target_update_freq: 100
+  n_episodes: 1000
+  seed: 42
+  double_dqn: true
+  dueling: false
+
+experiment_settings:
+  experiment_name: "dqn_double"
+  project: "tsla_dqn"
+  use_wandb: true
+

@@ -1,0 +1,39 @@
+#ppo_breakout
+
+env_settings:
+  env_name: "ALE/Breakout-v5"
+  seed: 42
+  max_episode_steps: 10000
+
+train_settings:
+  max_iters: 1000
+  total_timesteps: 5000000
+  lr: 0.00025
+  gamma: 0.995
+  lambda: 0.95
+  clip_param: 0.1
+  vf_loss_coeff: 0.5
+  entropy_coeff: 0.01
+
+  rollout_fragment_length: 2000
+  train_batch_size: 16000
+  sgd_minibatch_size: 512
+  num_sgd_iter: 10
+  grad_clip: 0.5
+
+  num_rollout_workers: 8
+  num_envs_per_worker: 1
+  num_gpus: 1
+
+  normalize_observations: true
+
+  checkpoint_freq: 10
+  evaluation_interval: 5
+  evaluation_duration: 10
+  evaluation_num_workers: 2
+
+experiment_settings:
+  experiment_name: "ppo_breakout_experiment_optimized"
+  project: "atari_rllib"
+  use_wandb: true
+

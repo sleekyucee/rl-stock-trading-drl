@@ -1,22 +1,23 @@
-#scripts/dataset.py
+#dataset
 
 import pandas as pd
 from sklearn.preprocessing import KBinsDiscretizer
 
 def load_stock_data(csv_path):
-    """Loads and returns the raw TSLA dataset."""
+    """Loads and returns the raw dataset."""
     df = pd.read_csv(csv_path, index_col='Date', parse_dates=True)
     return df
 
-def discretize_features(df, n_bins=5):
-    """Discretizes the features using quantile-based binning."""
+def fit_discretizer(df, n_bins=5):
+    """Fits a discretizer on the provided data and returns the transformer."""
     features = df.columns.tolist()
-    feature_data = df[features].copy()
-
     discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='quantile')
-    discretized_array = discretizer.fit_transform(feature_data)
+    discretizer.fit(df[features])
+    return discretizer
 
-    discretized_df = pd.DataFrame(discretized_array, columns=features, index=feature_data.index)
-
-    return discretized_df, feature_data
-
+def apply_discretizer(df, discretizer):
+    """Applies a previously fitted discretizer to new data."""
+    features = df.columns.tolist()
+    transformed = discretizer.transform(df[features])
+    discretized_df = pd.DataFrame(transformed, columns=features, index=df.index)
+    return discretized_df
